@@ -9,7 +9,7 @@ springBoot+webMagic+mybatisPlus
 
 3.在数据库中新建house数据库
 
-4.运行项目中sql文件夹下的
+4.运行项目中sql文件夹下的  
 house_area.sql                               
 house_house_info.sql                           
 house_house_price_record.sql 
