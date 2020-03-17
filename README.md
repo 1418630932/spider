@@ -3,14 +3,19 @@ java webmagic爬虫✈  爬取杭州链家二手房源 注释多多 自己的数
 
 springBoot+webMagic+mybatisPlus
 环境准备
-1.maven，         
-2.java8，    
-3.在数据库中新建house数据库，        
-4.运行项目中sql文件夹下的，   
+1.maven
+
+2.java8  
+
+3.在数据库中新建house数据库
+
+4.运行项目中sql文件夹下的
 house_area.sql                               
 house_house_info.sql                           
-house_house_price_record.sql， 
+house_house_price_record.sql 
+
 5.启动springboot的主方法，
+
 6.数据会逐步插入house_info表中，
           
 
