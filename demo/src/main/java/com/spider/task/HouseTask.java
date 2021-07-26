@@ -37,7 +37,8 @@ public class HouseTask {
 
     //爬取数据库表中每个地区的二手房信息
 //    @Scheduled(cron = "0 0 12 * * ?")    //每天中午12点启动一次   凌晨要被封
-    @Scheduled(initialDelay = 1000, fixedDelay = 24*60*6000) //容器启动后10秒开始执行 然后隔1天再执行
+    //容器启动后10秒开始执行 然后隔1天再执行
+//    @Scheduled(initialDelay = 1000, fixedDelay = 24*60*6000)
     public void start() {
         MyLog.logInfo("开始爬虫");
         QueryWrapper<Area> queryWrapper = new QueryWrapper<>();
