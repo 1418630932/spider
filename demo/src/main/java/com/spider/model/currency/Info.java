@@ -10,5 +10,5 @@ import lombok.Data;
 @Data
 public class Info {
     private String address;
-    private Long holders;
+    private Integer holders;
 }
