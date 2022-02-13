@@ -2,6 +2,7 @@ package com.spider.client;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.spider.log.MyLog;
 import com.spider.model.currency.Currency;
 import com.sun.org.apache.bcel.internal.generic.NEW;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ public class DexToolClient {
         httpHeaders.add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36");
         HttpEntity httpEntity = new HttpEntity(httpHeaders);
         String json = baseHttpClient.get(HOT_URL, httpEntity, String.class);
+        MyLog.logInfo("http result is"+JSON.toJSONString(json));
         List<Currency> currencyList = JSON.parseArray(json, Currency.class);
         return currencyList;
     }
