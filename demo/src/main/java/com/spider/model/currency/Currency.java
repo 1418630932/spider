@@ -10,6 +10,7 @@ import lombok.Data;
  **/
 @Data
 public class Currency {
+    private String id;
     private Long createdAtTimestamp;
     private Token token0;
     private Token token1;

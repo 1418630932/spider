@@ -3,26 +3,20 @@ package com.spider.task;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.spider.client.DexToolClient;
 import com.spider.client.DingdingNotifyClient;
-import com.spider.entity.Area;
 import com.spider.entity.CurrencyInfo;
-import com.spider.entity.HouseInfo;
 import com.spider.log.MyLog;
 import com.spider.model.currency.Currency;
 import com.spider.model.currency.Info;
 import com.spider.model.currency.Token;
 import com.spider.model.dingding.NotifyDO;
 import com.spider.model.dingding.TextDO;
-import com.spider.processor.LianJiaProcessor;
-import com.spider.service.IAreaService;
+import com.spider.service.ICurrencyEventNotifyService;
 import com.spider.service.ICurrencyInfoService;
-import com.spider.service.IHouseInfoService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -42,15 +36,15 @@ public class CurrencyTask {
     @Autowired
     private ICurrencyInfoService currencyInfoService;
     @Autowired
-    private DingdingNotifyClient dingdingNotifyClient;
-
-    private static final String NOTIFY_URL ="https://oapi.dingtalk.com/robot/send?access_token=5b82349f101497fba27dde0dd8b7e675ec44aaeb776d429dcdfe3b22797a871e";
-    //容器启动后10秒开始执行 然后隔5分钟再执行
+    private ICurrencyEventNotifyService  currencyEventNotifyService;
+ //容器启动后10秒开始执行 然后隔5分钟周期执行
     @Scheduled(initialDelay = 1000, fixedDelay = 5*60*1000)
     public void start() {
         MyLog.logInfo("开始爬虫");
         List<Currency> hotCurrency = dexToolClient.getHotCurrency();
+        //过滤数据格式非法的数据
         List<Currency> filterList = hotCurrency.stream().filter(data -> data.getInfo() != null).collect(Collectors.toList());
+        //查询数据库存在的数据 目的是为了挖掘新的土狗 不要过度推送
         List<String> hotIdList = filterList.stream().map(Currency::getInfo).map(Info::getAddress).collect(Collectors.toList());
         QueryWrapper<CurrencyInfo> queryWrapper = new QueryWrapper<>();
         queryWrapper.in("id",hotIdList);
@@ -60,9 +54,9 @@ public class CurrencyTask {
             List<CurrencyInfo> currencyInfoList = transferCurrencyInfoList(filterList);
             if (CollectionUtils.isNotEmpty(currencyInfoList)){
                 currencyInfoService.saveBatch(currencyInfoList);
-                String content = buildContent(currencyInfoList);
+                String content = currencyEventNotifyService.buildContent(currencyInfoList);
                 if (StringUtils.isNoneBlank(content)){
-                    dingDingNotify(content);
+                    currencyEventNotifyService.dingDingNotify(content);
                 }
             }
         }else {
@@ -71,9 +65,9 @@ public class CurrencyTask {
             List<CurrencyInfo> currencyInfoList = transferCurrencyInfoList(remainList);
             if (CollectionUtils.isNotEmpty(currencyInfoList)){
                 currencyInfoService.saveBatch(currencyInfoList);
-                String content = buildContent(currencyInfoList);
+                String content = currencyEventNotifyService.buildContent(currencyInfoList);
                 if (StringUtils.isNoneBlank(content)){
-                    dingDingNotify(content);
+                    currencyEventNotifyService.dingDingNotify(content);
                 }
             }
         }
@@ -101,8 +95,8 @@ public class CurrencyTask {
             return null;
         }
         CurrencyInfo currencyInfo = new CurrencyInfo();
+        currencyInfo.setId(currency.getId());
         String token = Optional.ofNullable(currency.getInfo()).map(Info::getAddress).orElse(null);
-        currencyInfo.setId(token);
         currencyInfo.setToken(token);
         currencyInfo.setHolder(Optional.ofNullable(currency.getInfo()).map(Info::getHolders).orElse(null));
 
@@ -118,28 +112,5 @@ public class CurrencyTask {
                 .map(OffsetDateTime::toLocalDateTime)
                 .orElse(null));
         return currencyInfo;
-    }
-
-    private String buildContent(List<CurrencyInfo> currencyInfoList){
-        if (CollectionUtils.isEmpty(currencyInfoList)){
-            return null;
-        }
-        StringBuilder content = new StringBuilder();
-        for (CurrencyInfo currencyInfo : currencyInfoList) {
-            content.append(currencyInfo.getName()).append(":")
-                    .append(currencyInfo.getToken())
-                    .append("  holder:").append(currencyInfo.getHolder())
-                    .append("\n");
-        }
-        return content.toString();
-    }
-
-    private void dingDingNotify(String content){
-        NotifyDO notifyDO = new NotifyDO();
-        notifyDO.setMsgtype("text");
-        TextDO textDO = new TextDO();
-        textDO.setContent("土狗"+"\n"+content);
-        notifyDO.setText(textDO);
-        dingdingNotifyClient.notify(NOTIFY_URL,notifyDO);
     }
 }
