@@ -1,26 +1,22 @@
 package com.spider.entity;
 
-import java.time.LocalDateTime;
-import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
 /**
  * <p>
- * 土狗信息
+ * 土狗信息汇总
  * </p>
  *
  * @author zhuliyang
  * @since 2021-07-26
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
-public class CurrencyInfo implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
+public class CurrencySummaryDto {
     private String id;
 
     private String token;
@@ -30,8 +26,10 @@ public class CurrencyInfo implements Serializable {
     private Integer holder;
 
     private LocalDateTime createTime;
-
+    //池子大小($)
     private Integer liquidity;
+    //24小时波动幅度（%）
+    private String change24H;
 
 
 }

@@ -15,4 +15,5 @@ public class Currency {
     private Token token0;
     private Token token1;
     private Info info;
+    private Double liquidity;
 }

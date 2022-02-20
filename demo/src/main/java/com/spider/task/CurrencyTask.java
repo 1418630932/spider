@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.spider.client.DexToolClient;
 import com.spider.client.DingdingNotifyClient;
 import com.spider.entity.CurrencyInfo;
+import com.spider.entity.CurrencySummaryDto;
 import com.spider.log.MyLog;
 import com.spider.model.currency.Currency;
 import com.spider.model.currency.Info;
@@ -12,6 +13,7 @@ import com.spider.model.dingding.NotifyDO;
 import com.spider.model.dingding.TextDO;
 import com.spider.service.ICurrencyEventNotifyService;
 import com.spider.service.ICurrencyInfoService;
+import com.spider.service.impl.ICurrencyCollectorServiceImpl;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,8 @@ public class CurrencyTask {
     @Autowired
     private ICurrencyInfoService currencyInfoService;
     @Autowired
+    private ICurrencyCollectorServiceImpl currencyCollectorService;
+    @Autowired
     private ICurrencyEventNotifyService  currencyEventNotifyService;
  //容器启动后10秒开始执行 然后隔5分钟周期执行
     @Scheduled(initialDelay = 1000, fixedDelay = 5*60*1000)
@@ -54,7 +58,8 @@ public class CurrencyTask {
             List<CurrencyInfo> currencyInfoList = transferCurrencyInfoList(filterList);
             if (CollectionUtils.isNotEmpty(currencyInfoList)){
                 currencyInfoService.saveBatch(currencyInfoList);
-                String content = currencyEventNotifyService.buildContent(currencyInfoList);
+                List<CurrencySummaryDto> currencySummaryDtos = currencyCollectorService.collectorList(currencyInfoList);
+                String content = currencyEventNotifyService.buildContent(currencySummaryDtos);
                 if (StringUtils.isNoneBlank(content)){
                     currencyEventNotifyService.dingDingNotify(content);
                 }
@@ -65,7 +70,8 @@ public class CurrencyTask {
             List<CurrencyInfo> currencyInfoList = transferCurrencyInfoList(remainList);
             if (CollectionUtils.isNotEmpty(currencyInfoList)){
                 currencyInfoService.saveBatch(currencyInfoList);
-                String content = currencyEventNotifyService.buildContent(currencyInfoList);
+                List<CurrencySummaryDto> currencySummaryDtos = currencyCollectorService.collectorList(currencyInfoList);
+                String content = currencyEventNotifyService.buildContent(currencySummaryDtos);
                 if (StringUtils.isNoneBlank(content)){
                     currencyEventNotifyService.dingDingNotify(content);
                 }
@@ -103,6 +109,8 @@ public class CurrencyTask {
         String name0 = Optional.ofNullable(currency.getToken0()).map(Token::getSymbol).orElse("null");
         String name1 = Optional.ofNullable(currency.getToken1()).map(Token::getSymbol).orElse("null");
         currencyInfo.setName(name0+"-"+name1);
+        Integer liquidity = Optional.ofNullable(currency.getLiquidity()).map(Double::intValue).orElse(null);
+        currencyInfo.setLiquidity(liquidity);
 
         currencyInfo.setCreateTime(Optional.ofNullable(currency.getCreatedAtTimestamp())
                 .map(timestamp->timestamp*1000)

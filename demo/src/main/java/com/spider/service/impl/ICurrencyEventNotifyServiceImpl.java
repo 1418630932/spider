@@ -2,6 +2,7 @@ package com.spider.service.impl;
 
 import com.spider.client.DingdingNotifyClient;
 import com.spider.entity.CurrencyInfo;
+import com.spider.entity.CurrencySummaryDto;
 import com.spider.model.dingding.NotifyDO;
 import com.spider.model.dingding.TextDO;
 import com.spider.service.ICurrencyEventNotifyService;
@@ -25,17 +26,19 @@ public class ICurrencyEventNotifyServiceImpl implements ICurrencyEventNotifyServ
     private DingdingNotifyClient dingdingNotifyClient;
 
     @Override
-    public String buildContent(List<CurrencyInfo> currencyInfoList) {
-        if (CollectionUtils.isEmpty(currencyInfoList)){
+    public String buildContent(List<CurrencySummaryDto> currencySummaryDtoList) {
+        if (CollectionUtils.isEmpty(currencySummaryDtoList)){
             return null;
         }
         StringBuilder content = new StringBuilder();
-        for (CurrencyInfo currencyInfo : currencyInfoList) {
-            content.append("name: ").append(currencyInfo.getName()).append("\n")
-                    .append("token: ").append(currencyInfo.getToken()).append("\n")
-                    .append("holder:").append(currencyInfo.getHolder()).append("\n")
-                    .append("开盘时间:").append(currencyInfo.getCreateTime()).append("\n")
-                    .append(TOKEN_DETAIL_URL).append(currencyInfo.getId()).append("\n")
+        for (CurrencySummaryDto currencySummaryDto : currencySummaryDtoList) {
+            content.append("name: ").append(currencySummaryDto.getName()).append("\n")
+                    .append("token: ").append(currencySummaryDto.getToken()).append("\n")
+                    .append("持有人:").append(currencySummaryDto.getHolder()).append("\n")
+                    .append("池子大小:").append("$ ").append(currencySummaryDto.getLiquidity()).append("\n")
+                    .append("24H涨幅:").append(currencySummaryDto.getChange24H()).append("\n")
+                    .append("开盘时间:").append(currencySummaryDto.getCreateTime()).append("\n")
+                    .append(TOKEN_DETAIL_URL).append(currencySummaryDto.getId()).append("\n")
                     .append("\n");
         }
         return content.toString();

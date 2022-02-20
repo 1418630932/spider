@@ -1,6 +1,7 @@
 package com.spider.service;
 
 import com.spider.entity.CurrencyInfo;
+import com.spider.entity.CurrencySummaryDto;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ import java.util.List;
  * @time 23:25
  **/
 public interface ICurrencyEventNotifyService {
-    String buildContent(List<CurrencyInfo> currencyInfoList);
+    String buildContent(List<CurrencySummaryDto> currencySummaryDtoList);
 
     void dingDingNotify(String content);
 }
