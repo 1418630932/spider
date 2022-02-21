@@ -49,9 +49,9 @@ public class CurrencyTask {
         //过滤数据格式非法的数据
         List<Currency> filterList = hotCurrency.stream().filter(data -> data.getInfo() != null).collect(Collectors.toList());
         //查询数据库存在的数据 目的是为了挖掘新的土狗 不要过度推送
-        List<String> hotIdList = filterList.stream().map(Currency::getInfo).map(Info::getAddress).collect(Collectors.toList());
+        List<String> hotTokenList = filterList.stream().map(Currency::getInfo).map(Info::getAddress).collect(Collectors.toList());
         QueryWrapper<CurrencyInfo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in("id",hotIdList);
+        queryWrapper.in("token",hotTokenList);
         List<CurrencyInfo> existedList = currencyInfoService.list(queryWrapper);
 
         if (CollectionUtils.isEmpty(existedList)){
@@ -65,7 +65,7 @@ public class CurrencyTask {
                 }
             }
         }else {
-            Set<String> existsSet = existedList.stream().map(CurrencyInfo::getId).collect(Collectors.toSet());
+            Set<String> existsSet = existedList.stream().map(CurrencyInfo::getToken).collect(Collectors.toSet());
             List<Currency> remainList = filterList.stream().filter(currency -> !existsSet.contains(currency.getInfo().getAddress())).collect(Collectors.toList());
             List<CurrencyInfo> currencyInfoList = transferCurrencyInfoList(remainList);
             if (CollectionUtils.isNotEmpty(currencyInfoList)){
