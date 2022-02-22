@@ -19,7 +19,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -48,10 +51,11 @@ public class CurrencyTask {
         List<Currency> hotCurrency = dexToolClient.getHotCurrency();
         //过滤数据格式非法的数据
         List<Currency> filterList = hotCurrency.stream().filter(data -> data.getInfo() != null).collect(Collectors.toList());
-        //查询数据库存在的数据 目的是为了挖掘新的土狗 不要过度推送
+        //查询数据库存在的数据 目的是为了挖掘新的土狗 不要过度推送 3天之内推送的不要重复推送
         List<String> hotTokenList = filterList.stream().map(Currency::getInfo).map(Info::getAddress).collect(Collectors.toList());
         QueryWrapper<CurrencyInfo> queryWrapper = new QueryWrapper<>();
         queryWrapper.in("token",hotTokenList);
+        queryWrapper.gt("publish_time", new Date(System.currentTimeMillis()-3*24*60*60*1000));
         List<CurrencyInfo> existedList = currencyInfoService.list(queryWrapper);
 
         if (CollectionUtils.isEmpty(existedList)){
@@ -65,6 +69,7 @@ public class CurrencyTask {
                 }
             }
         }else {
+            //数据库已存在的币
             Set<String> existsSet = existedList.stream().map(CurrencyInfo::getToken).collect(Collectors.toSet());
             List<Currency> remainList = filterList.stream().filter(currency -> !existsSet.contains(currency.getInfo().getAddress())).collect(Collectors.toList());
             List<CurrencyInfo> currencyInfoList = transferCurrencyInfoList(remainList);
@@ -119,6 +124,7 @@ public class CurrencyTask {
                 .map(instant -> instant.atOffset(ZoneOffset.of("+8")))
                 .map(OffsetDateTime::toLocalDateTime)
                 .orElse(null));
+        currencyInfo.setPublishTime(LocalDateTime.now(ZoneId.systemDefault()));
         return currencyInfo;
     }
 }

@@ -33,5 +33,7 @@ public class CurrencyInfo implements Serializable {
 
     private Integer liquidity;
 
+    private LocalDateTime publishTime;
+
 
 }
