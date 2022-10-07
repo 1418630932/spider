@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
  * @time 23:13
  **/
 @Repository
-public class DingdingNotifyClient {
+public class DingTalkNotifyClient {
     @Autowired
     private BaseHttpClient baseHttpClient;
 

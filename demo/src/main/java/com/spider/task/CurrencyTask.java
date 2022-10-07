@@ -2,15 +2,12 @@ package com.spider.task;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.spider.client.DexToolClient;
-import com.spider.client.DingdingNotifyClient;
 import com.spider.entity.CurrencyInfo;
 import com.spider.entity.CurrencySummaryDto;
 import com.spider.log.MyLog;
 import com.spider.model.currency.Currency;
 import com.spider.model.currency.Info;
 import com.spider.model.currency.Token;
-import com.spider.model.dingding.NotifyDO;
-import com.spider.model.dingding.TextDO;
 import com.spider.service.ICurrencyEventNotifyService;
 import com.spider.service.ICurrencyInfoService;
 import com.spider.service.impl.ICurrencyCollectorServiceImpl;

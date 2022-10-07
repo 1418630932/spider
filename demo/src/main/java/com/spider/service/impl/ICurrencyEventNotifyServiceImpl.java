@@ -1,7 +1,6 @@
 package com.spider.service.impl;
 
-import com.spider.client.DingdingNotifyClient;
-import com.spider.entity.CurrencyInfo;
+import com.spider.client.DingTalkNotifyClient;
 import com.spider.entity.CurrencySummaryDto;
 import com.spider.model.dingding.NotifyDO;
 import com.spider.model.dingding.TextDO;
@@ -23,7 +22,7 @@ public class ICurrencyEventNotifyServiceImpl implements ICurrencyEventNotifyServ
 
     private static final String TOKEN_DETAIL_URL ="https://www.dextools.io/app/bsc/pair-explorer/";
     @Autowired
-    private DingdingNotifyClient dingdingNotifyClient;
+    private DingTalkNotifyClient dingTalkNotifyClient;
 
     @Override
     public String buildContent(List<CurrencySummaryDto> currencySummaryDtoList) {
@@ -51,7 +50,7 @@ public class ICurrencyEventNotifyServiceImpl implements ICurrencyEventNotifyServ
         TextDO textDO = new TextDO();
         textDO.setContent("土狗"+"\n"+content);
         notifyDO.setText(textDO);
-        dingdingNotifyClient.notify(NOTIFY_URL,notifyDO);
+        dingTalkNotifyClient.notify(NOTIFY_URL,notifyDO);
     }
 
 

@@ -1,14 +1,10 @@
 package com.spider.service.impl;
 
 import com.spider.client.DexToolClient;
-import com.spider.client.DingdingNotifyClient;
 import com.spider.entity.CurrencyInfo;
 import com.spider.entity.CurrencySummaryDto;
 import com.spider.model.currency.PairSummary;
-import com.spider.model.dingding.NotifyDO;
-import com.spider.model.dingding.TextDO;
 import com.spider.service.ICurrencyCollectorService;
-import com.spider.service.ICurrencyEventNotifyService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
